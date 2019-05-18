@@ -10,6 +10,11 @@ async function getFlashSale() {
   const html = await page.content()
   fs.writeFileSync('flash-sale.html', html)
   await browser.close()
+
+}
+
+async function lookForItems() {
+  // TODO
 }
 
 getFlashSale()
