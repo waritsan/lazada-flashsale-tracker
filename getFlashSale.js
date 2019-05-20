@@ -2,9 +2,9 @@ const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
 const fs = require('fs')
 
-const uri = 'https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale'
+const flashSaleUri = 'https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale'
 
-async function getFlashSale() {
+async function getFlashSale(uri) {
     const browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     })
@@ -15,14 +15,20 @@ async function getFlashSale() {
     return html
 }
 
-async function lookForItems() {
-    const data = await getFlashSale()
+async function lookForItems(itemName) {
+    const data = await getFlashSale(flashSaleUri)
     const $ = cheerio.load(data)
-    const saleTitleElements = $('div .sale-title')
-    saleTitleElements.each((index, saleTitleElement) => {
-        const name = $(saleTitleElement).text()
-        console.log(name)
+    $('div .item-list-title').each((index, element) => {
+        const startTime = $(element).text()
+        $(itemListTitleElement).next().children('a').each((index, itemElement) => {
+            const link = $(itemElement).attr('href')
+            const img = $(itemElement).find('.image').attr('data-ks-lazyload')
+            const name =  $(itemElement).find('.sale-title').text()
+            const salePrice = $(itemElement).find('.sale-price').text()
+            const originPrice = $(itemElement).find('.origin-price-value').text()
+            console.log(originPrice)
+        })
     })
 }
 
-lookForItems()
+lookForItems('Samsung')
