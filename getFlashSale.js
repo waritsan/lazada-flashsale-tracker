@@ -15,20 +15,44 @@ async function getFlashSale(uri) {
     return html
 }
 
-async function lookForItems(itemName) {
-    const data = await getFlashSale(flashSaleUri)
+const parseFlashSaleItems = (data) => {
     const $ = cheerio.load(data)
-    $('div .item-list-title').each((index, element) => {
+    var items = []
+    $('div .item-list-title').each((_, element) => {
         const startTime = $(element).text()
-        $(itemListTitleElement).next().children('a').each((index, itemElement) => {
-            const link = $(itemElement).attr('href')
-            const img = $(itemElement).find('.image').attr('data-ks-lazyload')
-            const name =  $(itemElement).find('.sale-title').text()
-            const salePrice = $(itemElement).find('.sale-price').text()
-            const originPrice = $(itemElement).find('.origin-price-value').text()
-            console.log(originPrice)
+        $(element).next().children('a').each((_, element) => {
+            const link = $(element).attr('href')
+            const img = $(element).find('.image').attr('data-ks-lazyload')
+            const name =  $(element).find('.sale-title').text()
+            const salePrice = removeSpaces($(element).find('.sale-price').text().replace(/\s+/g, ''))
+            const originPrice = removeSpaces($(element).find('.origin-price-value').text())
+            const item = {
+                name: name,
+                salePrice: salePrice,
+                originPrice: originPrice,
+                startTime: startTime,
+                img: img,
+                link: link
+            }
+            items.push(item)
         })
     })
+    return items
+}
+
+const removeSpaces = (str) => {
+    return str.replace(/\s+/g, '')
+}
+
+const findItem = (itemName, items) => {
+    // TODO
+}
+
+async function lookForItems(itemName) {
+    const data = await getFlashSale(flashSaleUri)
+    const items = parseFlashSaleItems(data)
+    findItem(itemName, items)
+    console.log(items)
 }
 
 lookForItems('Samsung')
