@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const fs = require('fs')
+const Fuse = require('fuse.js')
 
 const flashSaleUri = 'https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale'
 
@@ -45,14 +45,20 @@ const removeSpaces = (str) => {
 }
 
 const findItem = (itemName, items) => {
-    // TODO
+    const fuse = new Fuse(items, {
+        shouldSort: true,
+        threshold: 0.3,
+        keys: ['name']
+    })
+    const foundItems = fuse.search(itemName)
+    return foundItems
 }
 
 async function lookForItems(itemName) {
     const data = await getFlashSale(flashSaleUri)
     const items = parseFlashSaleItems(data)
-    findItem(itemName, items)
-    console.log(items)
+    const foundItem = findItem(itemName, items)
+    console.log(foundItem)
 }
 
 lookForItems('Samsung')
