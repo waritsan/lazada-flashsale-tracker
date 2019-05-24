@@ -1,8 +1,12 @@
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
 const Fuse = require('fuse.js')
+const mongoose = require('mongoose')
+const Item = require('./models/itemModel')
 
 const flashSaleUri = 'https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale'
+const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/lazada'
+mongoose.connect(mongodbUri, { useNewUrlParser: true })
 
 async function getFlashSale(uri) {
     const browser = await puppeteer.launch({
@@ -44,21 +48,27 @@ const removeSpaces = (str) => {
     return str.replace(/\s+/g, '')
 }
 
-const findItem = (itemName, items) => {
-    const fuse = new Fuse(items, {
+const findItem = (myItem, flashSaleItems) => {
+    const fuse = new Fuse(flashSaleItems, {
         shouldSort: true,
         threshold: 0.3,
         keys: ['name']
     })
-    const foundItems = fuse.search(itemName)
+    const foundItems = fuse.search(myItem.name)
     return foundItems
 }
 
-async function lookForItems(itemName) {
+const getMyItems = async () => {
+    const myItems = Item.find().exec()
+    return myItems
+}
+
+const lookForItems = async () => {
     const data = await getFlashSale(flashSaleUri)
-    const items = parseFlashSaleItems(data)
-    const foundItem = findItem(itemName, items)
-    console.log(foundItem)
+    const flashSaleItems = parseFlashSaleItems(data)
+    const myItems = await getMyItems()
+    const myItemsInFlashSale = myItems.map(myItem => findItem(myItem, flashSaleItems))
+    console.log(myItemsInFlashSale)
 }
 
 lookForItems('Samsung')
