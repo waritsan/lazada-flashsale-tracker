@@ -74,4 +74,4 @@ const lookForItems = async () => {
     console.log(myItemsInFlashSale)
 }
 
-lookForItems('Samsung')
+lookForItems()
