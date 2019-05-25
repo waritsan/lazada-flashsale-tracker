@@ -15,6 +15,7 @@
     "express": "^4.17.0",
     "fuse.js": "^3.4.4",
     "mongoose": "^5.5.9",
+    "nodemailer": "^6.2.1",
     "puppeteer": "^1.15.0"
   }
 }

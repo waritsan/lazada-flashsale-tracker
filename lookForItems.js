@@ -3,6 +3,7 @@ const cheerio = require('cheerio')
 const Fuse = require('fuse.js')
 const mongoose = require('mongoose')
 const Item = require('./models/itemModel')
+const sendEmail = require('./helpers/sendEmail')
 
 const flashSaleUri = 'https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale'
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/lazada'
@@ -68,6 +69,8 @@ const lookForItems = async () => {
     const flashSaleItems = parseFlashSaleItems(data)
     const myItems = await getMyItems()
     const myItemsInFlashSale = myItems.map(myItem => findItem(myItem, flashSaleItems))
+    // TODO build HTML body
+    sendEmail('Lazada Flash Sale Alert', JSON.stringify(myItemsInFlashSale, null, 2))
     console.log(myItemsInFlashSale)
 }
 
