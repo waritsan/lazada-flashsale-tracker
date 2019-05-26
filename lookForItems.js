@@ -64,13 +64,19 @@ const getMyItems = async () => {
     return myItems
 }
 
+const buildEmailHtmlBody = (myItemsInFlashSale) => {
+    // TODO
+    const htmlString = ``
+    return htmlString
+}
+
 const lookForItems = async () => {
     const data = await getFlashSale(flashSaleUri)
     const flashSaleItems = parseFlashSaleItems(data)
     const myItems = await getMyItems()
     const myItemsInFlashSale = myItems.map(myItem => findItem(myItem, flashSaleItems))
-    // TODO build HTML body
-    sendEmail('Lazada Flash Sale Alert', JSON.stringify(myItemsInFlashSale, null, 2))
+    const emailHtmlBody = buildEmailHtmlBody(myItemsInFlashSale)
+    if (myItemsInFlashSale[0].length > 0) sendEmail('Lazada Flash Sale Alert', JSON.stringify(myItemsInFlashSale, null, 2))
     console.log(myItemsInFlashSale)
 }
 
