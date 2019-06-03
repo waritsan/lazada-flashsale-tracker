@@ -5,10 +5,6 @@ const mongoose = require('mongoose')
 const Item = require('./models/itemModel')
 const sendEmail = require('./helpers/sendEmail')
 
-const flashSaleUri = 'https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale'
-const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/lazada'
-mongoose.connect(mongodbUri, { useNewUrlParser: true })
-
 async function getFlashSale(uri) {
     const browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -60,7 +56,10 @@ const findItem = (myItem, flashSaleItems) => {
 }
 
 const getMyItems = async () => {
-    const myItems = Item.find().exec()
+    const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/lazada'
+    mongoose.connect(mongodbUri, { useNewUrlParser: true })
+    const myItems = await Item.find().exec()
+    mongoose.connection.close()
     return myItems
 }
 
@@ -71,7 +70,7 @@ const buildEmailHtmlBody = (myItemsInFlashSale) => {
 }
 
 const lookForItems = async () => {
-    const data = await getFlashSale(flashSaleUri)
+    const data = await getFlashSale('https://pages.lazada.co.th/wow/i/th/LandingPage/flashsale')
     const flashSaleItems = parseFlashSaleItems(data)
     const myItems = await getMyItems()
     const myItemsInFlashSale = myItems.map(myItem => findItem(myItem, flashSaleItems))
